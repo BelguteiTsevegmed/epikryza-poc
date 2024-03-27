@@ -42,7 +42,7 @@ function processAudio(audioBlob) {
     formData.append('audio', audioBlob, 'audio.wav');
 
     // Send the audio file to the server
-    fetch('https://epikryza-poc-1efda3f7fa65.herokuapp.com/process-audio', { //TODO change the website
+    fetch('https://epikryza-a89fc16ce1c2.herokuapp.com/process-audio', { //TODO change the website
         method: 'POST',
         body: formData,
     })
