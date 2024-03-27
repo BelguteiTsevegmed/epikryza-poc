@@ -37,6 +37,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+    const recordBtn = document.getElementById('recordBtn');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const audioPlayback = document.getElementById('audioPlayback');
+    const audioFileInput = document.getElementById('audioFile');
+    let mediaRecorder;
+    let audioChunks = [];
+
+    // Existing code for handling audio recording...
+
+    uploadBtn.addEventListener('click', () => {
+        const audioFiles = audioFileInput.files;
+        if (audioFiles.length === 0) {
+            alert('Please select an audio file first.');
+            return;
+        }
+        const audioFile = audioFiles[0];
+        processAudio(audioFile);
+    });
+});
+
 function processAudio(audioBlob) {
     let formData = new FormData();
     formData.append('audio', audioBlob, 'audio.wav');
