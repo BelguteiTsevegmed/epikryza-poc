@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     const recordBtn = document.getElementById('recordBtn');
+    const uploadBtn = document.getElementById('uploadBtn');
     const audioPlayback = document.getElementById('audioPlayback');
+    const audioFileInput = document.getElementById('audioFile');
     let mediaRecorder;
     let audioChunks = [];
 
@@ -20,6 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const audioBlob = new Blob(audioChunks, { 'type': 'audio/wav' });
                 const audioUrl = URL.createObjectURL(audioBlob);
                 audioPlayback.src = audioUrl;
+
+                // Use the processAudio function for the recorded audio
                 processAudio(audioBlob);
             };
         })
@@ -35,17 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
             recordBtn.textContent = "Stop Recording";
         }
     });
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    const recordBtn = document.getElementById('recordBtn');
-    const uploadBtn = document.getElementById('uploadBtn');
-    const audioPlayback = document.getElementById('audioPlayback');
-    const audioFileInput = document.getElementById('audioFile');
-    let mediaRecorder;
-    let audioChunks = [];
-
-    // Existing code for handling audio recording...
 
     uploadBtn.addEventListener('click', () => {
         const audioFiles = audioFileInput.files;
@@ -54,26 +47,32 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         const audioFile = audioFiles[0];
+
+        // Use the processAudio function for the uploaded audio file
         processAudio(audioFile);
     });
 });
 
-function processAudio(audioBlob) {
+function processAudio(audioData) {
     let formData = new FormData();
-    formData.append('audio', audioBlob, 'audio.wav');
 
-    // Send the audio file to the server
-    fetch('https://epikryza-a89fc16ce1c2.herokuapp.com/process-audio', { //TODO change the website
+    // Handle both Blob from recording and File from input
+    if(audioData instanceof Blob) {
+        formData.append('audio', audioData, 'audio.wav');
+    } else {
+        // This is assuming audioData is a File
+        formData.append('audio', audioData);
+    }
+
+    fetch('https://epikryza-a89fc16ce1c2.herokuapp.com/process-audio', {
         method: 'POST',
         body: formData,
     })
-    .then(response => response.json()) // Parse the JSON response from the server
-    // Inside the processAudio function, after fetching data from the server
+    .then(response => response.json())
     .then(data => {
-    console.log('Success:', data);
-    // Update the webpage with the processed text
-    document.getElementById('transcription').textContent = data.transcript || "No transcription available.";
-    document.getElementById('processedText').textContent = data.processed_text || "No processed text available.";
+        console.log('Success:', data);
+        document.getElementById('transcription').textContent = data.transcript || "No transcription available.";
+        document.getElementById('processedText').textContent = data.processed_text || "No processed text available.";
     })
     .catch((error) => {
         console.error('Error:', error);
